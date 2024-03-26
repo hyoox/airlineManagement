@@ -1,59 +1,169 @@
-/* public/css/styles.css */
-
 body {
-  font-family: Arial, sans-serif;
-  background-color: #f4f4f4;
+  font-family: "Arial", sans-serif;
+  background-color: #000;
+  color: #fff;
   margin: 0;
+  padding: 0;
+  height: 100vh;
+}
+
+.wrapper {
+  display: flex;
+  flex-wrap: nowrap;
+  height: 100%;
+}
+
+#sidebar {
+  background-color: #222;
+  width: 25%;
+  overflow: auto;
+}
+
+#sidebar nav ul {
+  list-style-type: none;
   padding: 0;
 }
 
-.container {
-  width: 80%;
-  margin: auto;
-  overflow: hidden;
-}
-
-header {
-  background: #50b3a2;
-  color: white;
-  padding-top: 30px;
-  min-height: 70px;
-  border-bottom: #e8491d 3px solid;
-}
-
-header a {
-  color: #ffffff;
+#sidebar nav ul li a {
+  color: #ddd;
+  padding: 15px 20px;
   text-decoration: none;
-  text-transform: uppercase;
-  font-size: 16px;
+  display: block;
+  border-bottom: 1px solid #444;
 }
 
-header li {
-  float: left;
-  display: inline;
-  padding: 0 20px 0 20px;
+#sidebar nav ul li a:hover,
+#sidebar nav ul li a.active {
+  background-color: #444;
+  color: white;
 }
 
-header #branding {
-  float: left;
+#main-content {
+  width: 50%;
+  overflow: auto;
 }
 
-header #branding h1 {
-  margin: 0;
+#form-container {
+  width: 25%;
+  padding: 20px;
 }
 
-header nav {
-  float: right;
-  margin-top: 10px;
+input[type="text"],
+input[type="submit"],
+textarea {
+  width: calc(100% - 20px);
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-sizing: border-box;
+  background-color: #444;
+  color: #ddd;
 }
 
-header .highlight,
-header .current a {
-  color: #e8491d;
-  font-weight: bold;
+input[type="submit"] {
+  background-color: #e8491d;
+  color: #fff;
+  cursor: pointer;
 }
 
-header a:hover {
-  color: #ffffff;
-  font-weight: bold;
+input[type="submit"]:hover {
+  opacity: 0.9;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+table,
+th,
+td {
+  border: 1px solid #ddd;
+}
+
+th {
+  background-color: #222;
+}
+
+td {
+  background-color: #555;
+  color: #fff;
+}
+
+th,
+td {
+  text-align: left;
+  padding: 8px;
+}
+
+.dataTables_wrapper {
+  color: #ddd;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+  color: #ddd !important;
+  background-color: #666 !important;
+  border-radius: 4px;
+  border: 1px solid #aaa !important;
+  margin-top: 0.5em;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.current,
+.dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+  color: #fff !important;
+  background-color: #e8491d !important;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+  background-color: #777 !important;
+}
+
+.dataTables_wrapper .dataTables_length select {
+  background-color: #222;
+  color: #ddd;
+  border: 1px solid #444;
+  padding: 5px;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+  color: white !important;
+  background-color: #666 !important;
+  padding: 5px 10px;
+  margin: 5px;
+  border: 1px solid #444;
+  border-radius: 3px;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+  background-color: #777 !important;
+  border-color: #555;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.current,
+.dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+  color: white !important;
+  background-color: #e8491d !important;
+  border-color: #e8491d;
+}
+
+.dataTables_wrapper .dataTables_paginate a.paginate_button {
+  text-decoration: none !important;
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none;
+  color: white !important;
+}
+
+@media (max-width: 768px) {
+  .wrapper {
+    flex-wrap: wrap;
+  }
+
+  #sidebar,
+  #main-content,
+  #form-container {
+    width: 100%;
+    height: auto;
+  }
 }

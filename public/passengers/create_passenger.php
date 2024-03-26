@@ -1,31 +1,24 @@
-<!-- passengers/create_passenger.php -->
 <?php
-// Check if the form is submitted
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Include database connection
-    require_once "../config/dbconnect.php";
+// Include the database connection
+require_once "../../config/dbconnect.php";
 
-    // Get form data
+// Handle POST request to add a passenger
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $surname = $_POST['surname'];
     $name = $_POST['name'];
     $address = $_POST['address'];
     $phone = $_POST['phone'];
 
-    // Prepare SQL statement
     $stmt = $conn->prepare("INSERT INTO passengers (surname, name, address, phone) VALUES (?, ?, ?, ?)");
     $stmt->bind_param("ssss", $surname, $name, $address, $phone);
 
-    // Execute statement and check for success
     if ($stmt->execute()) {
-        echo "New passenger added successfully!";
+        echo "<p>New passenger added successfully!</p>";
     } else {
-        echo "Error: " . $stmt->error;
+        echo "<p>Error: " . $stmt->error . "</p>";
     }
 
-    // Close statement
     $stmt->close();
-    // Close connection
-    $conn->close();
 }
 ?>
 
@@ -33,33 +26,93 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Add New Passenger</title>
+    <title>Airline Management System</title>
     <link rel="stylesheet" href="../css/styles.css">
-<!-- Include jQuery -->
-<script src="https://code.jquery.com/jquery-3.5.1.js"></script>
-
-<!-- DataTables CSS and JS -->
-<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.24/css/jquery.dataTables.css">
-<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.js"></script>
-
-    <!-- You can include your stylesheet here -->
+    <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.24/css/jquery.dataTables.css">
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.js"></script>
 </head>
 <body>
-    <h2>Add New Passenger</h2>
-    <form action="create_passenger.php" method="post">
-        <label for="surname">Surname:</label>
-        <input type="text" id="surname" name="surname" required><br><br>
 
-        <label for="name">Name:</label>
-        <input type="text" id="name" name="name" required><br><br>
+<div class="wrapper">
+    <!-- Sidebar -->
+    <aside id="sidebar">
+        <nav>
+            <ul>
+                <li><a href="#" class="active">Passengers</a></li>
+                <li><a href="#">Flights</a></li>
+                <li><a href="#">Staff</a></li>
+                <li><a href="#">Airplanes</a></li>
+                <li><a href="#">Cities</a></li>
+            
+            </ul>
+        </nav>
+    </aside>
 
-        <label for="address">Address:</label>
-        <textarea id="address" name="address"></textarea><br><br>
+    <!-- Main Content -->
+    <section id="main-content">
+        <h1>Passenger List</h1>
+        <table id="passengersTable" class="display">
+            <thead>
+                <tr>
+                    <th>Surname</th>
+                    <th>Name</th>
+                    <th>Address</th>
+                    <th>Phone</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php
+                $stmt = $conn->prepare("SELECT surname, name, address, phone FROM passengers");
+                $stmt->execute();
+                $result = $stmt->get_result();
 
-        <label for="phone">Phone:</label>
-        <input type="text" id="phone" name="phone" required><br><br>
+                if ($result->num_rows > 0) {
+                    while($row = $result->fetch_assoc()) {
+                        echo "<tr>
+                                <td>" . htmlspecialchars($row['surname']) . "</td>
+                                <td>" . htmlspecialchars($row['name']) . "</td>
+                                <td>" . htmlspecialchars($row['address']) . "</td>
+                                <td>" . htmlspecialchars($row['phone']) . "</td>
+                            </tr>";
+                    }
+                }
+                $stmt->close();
+                ?>
+            </tbody>
+        </table>
+    </section>
 
-        <input type="submit" value="Submit">
-    </form>
+    <!-- Form Container -->
+    <aside id="form-container">
+        <h1>Add New Passenger</h1>
+        <form action="create_passenger.php" method="post">
+            <label for="surname">Surname:</label>
+            <input type="text" id="surname" name="surname" required><br><br>
+
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" required><br><br>
+
+            <label for="address">Address:</label>
+            <textarea id="address" name="address"></textarea><br><br>
+
+            <label for="phone">Phone:</label>
+            <input type="text" id="phone" name="phone" required><br><br>
+
+            <input type="submit" value="Submit">
+        </form>
+    </aside>
+</div>
+
+<script>
+    $(document).ready(function() {
+        $('#passengersTable').DataTable({
+            "pagingType": "full_numbers",
+            "lengthMenu": [5, 10, 15, 20],
+            "pageLength": 5
+        });
+    });
+</script>
+
 </body>
 </html>
