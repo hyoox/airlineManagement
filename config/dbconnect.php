@@ -4,7 +4,7 @@
 $servername = "localhost";
 $username = "root"; 
 $password = ""; 
-$dbname = "airline_management";
+$dbname = "AirlineSystem";
 
 // Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);

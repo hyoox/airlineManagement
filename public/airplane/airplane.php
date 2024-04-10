@@ -1,33 +1,16 @@
 <?php
 require_once "../../config/dbconnect.php";
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $manufacturer = $_POST['manufacturer'];
-    $model = $_POST['model'];
-    $sernum = $_POST['sernum'];
-
-    $stmt = $conn->prepare("INSERT INTO airplanes (manufacturer, model, sernum) VALUES (?, ?, ?)");
-    $stmt->bind_param("sss", $manufacturer, $model, $sernum);
-
-    if ($stmt->execute()) {
-        $message = "New airplane added successfully!";
-    } else {
-        $message = "Error: " . $stmt->error;
-    }
-
-    $stmt->close();
-}
-
 $airplanes = [];
-$stmt = $conn->prepare("SELECT airplane_id, manufacturer, model, sernum FROM airplanes");
-$stmt->execute();
-$result = $stmt->get_result();
-
-while($row = $result->fetch_assoc()) {
-    $airplanes[] = $row;
+$query = "SELECT airplane_id, manufacturer, model, sernum FROM airplanes";
+$result = $conn->query($query);
+if ($result) {
+    while ($row = $result->fetch_assoc()) {
+        $airplanes[] = $row;
+    }
+} else {
+    echo "Error: " . $conn->error;  // Display errors if query fails
 }
-
-$stmt->close();
 $conn->close();
 ?>
 
@@ -50,7 +33,7 @@ $conn->close();
                 <li><a href="../passengers/create_passenger.php">Passengers</a></li>
                 <li><a href="../flights/create_flight.php">Flights</a></li>
                 <li><a href="../staff/create_staff.php">Staff</a></li>
-                <li><a href="../airplane/create_airplane.php" class="active">Airplanes</a></li>
+                <li><a href="airplane.php" class="active">Airplanes</a></li>
                 <li><a href="../cities/create_city.php">Cities</a></li>
             </ul>
         </nav>
@@ -65,6 +48,7 @@ $conn->close();
                     <th>Manufacturer</th>
                     <th>Model</th>
                     <th>Serial Number</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -74,6 +58,10 @@ $conn->close();
                         <td><?= htmlspecialchars($airplane['manufacturer']) ?></td>
                         <td><?= htmlspecialchars($airplane['model']) ?></td>
                         <td><?= htmlspecialchars($airplane['sernum']) ?></td>
+                        <td>
+                            <button onclick="editAirplane(<?= htmlspecialchars(json_encode($airplane)) ?>)">Edit</button>
+                        
+                        </td>
                     </tr>
                 <?php endforeach; ?>
             </tbody>
@@ -81,23 +69,57 @@ $conn->close();
     </section>
 
     <aside id="form-container">
-        <h1>Add New Airplane</h1>
-        <?php if (!empty($message)): ?>
-            <p><?= $message ?></p>
-        <?php endif; ?>
-        <form action="create_airplane.php" method="post">
+        <h1 id="form-title">Add New Airplane</h1>
+        <form id="airplaneForm">
+            <input type="hidden" id="airplane_id" name="airplane_id">
             <label for="manufacturer">Manufacturer:</label>
             <input type="text" id="manufacturer" name="manufacturer" required><br><br>
             <label for="model">Model:</label>
             <input type="text" id="model" name="model" required><br><br>
             <label for="sernum">Serial Number:</label>
             <input type="text" id="sernum" name="sernum" required><br><br>
-            <input type="submit" value="Submit">
+            <button type="button" onclick="submitForm()">Submit</button>
+            <button type="button" id="deleteButton" onclick="deleteAirplane($('#airplane_id').val())" style="display: none;">Delete</button>
         </form>
     </aside>
 </div>
 
 <script>
+function submitForm() {
+    const airplaneId = $('#airplane_id').val();
+    const manufacturer = $('#manufacturer').val();
+    const model = $('#model').val();
+    const sernum = $('#sernum').val();
+    const action = airplaneId ? 'update' : 'add';
+    $.post('../../backend/api/airplanes/manage_airplanes.php?action=' + action, {
+        airplane_id: airplaneId,
+        manufacturer: manufacturer,
+        model: model,
+        sernum: sernum
+    }, function(data) {
+        alert(data);  // Display server response
+        location.reload();  // Reload the page to update the table
+    });
+}
+
+function editAirplane(airplane) {
+    $('#airplane_id').val(airplane.airplane_id);
+    $('#manufacturer').val(airplane.manufacturer);
+    $('#model').val(airplane.model);
+    $('#sernum').val(airplane.sernum);
+    $('#form-title').text('Edit Airplane');
+    $('#deleteButton').show();  // Show the delete button when editing
+}
+
+function deleteAirplane(airplaneId) {
+    if (!airplaneId) return;
+    if (!confirm("Are you sure you want to delete this airplane?")) return;
+    $.post('../../backend/api/airplanes/manage_airplanes.php?action=delete', { airplane_id: airplaneId }, function(data) {
+        alert(data);  // Display server response
+        location.reload();  // Reload the page to update the table
+    });
+}
+
 $(document).ready(function() {
     $('#airplanesTable').DataTable({
         "pagingType": "full_numbers",
@@ -105,6 +127,7 @@ $(document).ready(function() {
         "pageLength": 5
     });
 });
+
 </script>
 
 </body>
